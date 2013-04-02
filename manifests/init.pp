@@ -53,7 +53,7 @@ class module_template (
 
 ) inherits module_template::params {
 
-  $base_name         = 'module'
+  $base_name         = 'module_template'
   $config_port_var   = 'port'
   $firewall_priority = '200'
 
@@ -101,7 +101,7 @@ class module_template (
       module_template => {
         name   => value($config[$config_port_var]) ? {
           false   => '',
-          default => "${firewall_priority} INPUT Allow new Module_template connections"
+          default => "${firewall_priority} INPUT Allow new ModuleTemplate connections"
         },
         chain  => 'INPUT',
         state  => 'NEW',

@@ -1,5 +1,5 @@
 
-class Module_templateTemplate
+class ModuleTemplateTemplate
   
   #-----------------------------------------------------------------------------
   # Renderers  
