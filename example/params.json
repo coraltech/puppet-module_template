@@ -3,7 +3,7 @@
   "module_template::common_package_names" : [],
   "module_template::extra_package_names" : [],
   "module_template::package_ensure" : "present",
-  "module_template::packages" : {},
+  "module_template::package" : {},
   "module_template::package_defaults" : {},
   "module_template::env_file" : "undef",
   "module_template::env_template" : "undef",
