@@ -44,7 +44,11 @@ class module_template (
 
   $build_package_names  = $module_template::params::build_package_names,
   $common_package_names = $module_template::params::common_package_names,
+  $extra_package_names  = $module_template::params::extra_package_names,
   $package_ensure       = $module_template::params::package_ensure,
+  $env_file             = $module_template::params::env_file,
+  $env_template         = $module_template::params::env_template,
+  $variables            = {},
   $config_file          = $module_template::params::config_file,
   $config_template      = $module_template::params::config_template,
   $configurations       = {},
@@ -57,34 +61,40 @@ class module_template (
   $config_port_var   = 'port'
   $firewall_priority = '200'
 
-  $config = render(normalize($module_template::params::configurations, $configurations))
-
   #-----------------------------------------------------------------------------
   # Installation
 
   coral::packages { $base_name:
     resources => {
-      'build-packages' => {
+      build_packages => {
         name => $build_package_names
       },
-      'common-packages' => {
+      common_packages => {
         name    => $common_package_names,
-        require => 'build-packages'
+        require => 'build_packages'
+      },
+      extra_packages => {
+        name    => $extra_package_names,
+        require => 'common_packages'
       }
     },
-    defaults  => [
-      { ensure => $package_ensure },
-      "${base_name}::package_defaults"
-    ]
+    defaults => { ensure => $package_ensure }
   }
 
   #-----------------------------------------------------------------------------
   # Configuration
 
+  $env_vars = render(normalize($module_template::params::variables, $variables))
+  $config   = render(normalize($module_template::params::configurations, $configurations))
+
   coral::files { $base_name:
     resources => {
-      "${base_name}" => {
-        path    => $config_file,
+      env => {
+        path    => empty($env_vars) ? { true => '', default => $env_file },
+        content => template($env_template)
+      },
+      config => {
+        path    => empty($config) ? { true => '', default => $config_file },
         content => template($config_template)
       }
     },
@@ -124,7 +134,7 @@ class module_template (
 
   coral::services { $base_name:
     resources => {
-      "${base_name}" => {
+      service => {
         service => $service_name,
         ensure  => $service_ensure
       }
